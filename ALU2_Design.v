@@ -386,7 +386,7 @@ module ALU2 #(parameter WIDTH = 8)(CLK,RST,INP_VALID,MODE,CMD,CE,OPA,OPB,CIN,RES
                                                                                 ERR <= 1;
                                                                         end
                                                         end
-						4'd8: begin//shftL1_A
+						4'd9: begin//shftL1_A
                                                         if(INP_VALID==2'b01 || INP_VALID == 2'b11)begin
                                                                       
                                                                           RES <= OPA <<1;
