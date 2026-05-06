@@ -12,16 +12,42 @@ module ALU2 #(parameter WIDTH = 8)(CLK,RST,INP_VALID,MODE,CMD,CE,OPA,OPB,CIN,RES
 	reg [WIDTH-1:0]temp_a, temp_b, temp;
 	reg signed [WIDTH-1:0]signed_a, signed_b;
 	reg temp_OFLOW, temp_G, temp_L, temp_E, temp_ERR, temp_COUT;
+	wire [WIDTH -1 :0]sum;
+
         //output ports
 	output reg [WIDTH*2 -1:0]RES;
 	output reg OFLOW, COUT, G, L, E, ERR;
+	sum = $signed(OPA) + $signed(OPB);
 	always@(posedge CLK) begin
-		if(MODE == 1 && (CMD == 4'd9 || CMD == 4'd10)) begin
-			count = count + 1;
+		if(MODE == 1) begin
+			if(CMD == 4'd9) begin
+				if(count != 0) begin
+					count =0;
+					count = count +1;
+				end
+				else begin
+					if(count == 2'd3)
+						count =0;
+					else
+						count = count + 1;
+				end
+			end
+			else if(CMD == 4'd10) begin
+                                if(count != 0) begin
+                                        count =0;
+                                        count = count +1;
+                                end
+                                else begin
+                                        if(count == 2'd3)
+                                                count =0;
+                                        else
+                                                count = count + 1;
+                                end
+                        end
+					
+					
+			
 		end
-		else 
-			count =0;
-
 	end
 
 	always@(posedge CLK or posedge RST) begin
@@ -162,25 +188,27 @@ module ALU2 #(parameter WIDTH = 8)(CLK,RST,INP_VALID,MODE,CMD,CE,OPA,OPB,CIN,RES
 								2'b11: begin
 									{G,E,L} = {(OPA>OPB),(OPA==OPB),(OPA<OPB)};					
 									end
-								default:
+								default:begin
 									{G,E,L} = 3'b000;
 									ERR =1;
+									end
 							endcase
 						4'd9: begin //Multiplication with incremented inputs
 							
 							if(INP_VALIF == 2'b11) begin
-
+								temp_a = OPA;
+								temp_b = OPB;
 							case(count)
 								2'd1: begin
-									temp_a = OPA;
-									temp_b = OPB;
+									temp_a = temp_a +1;
+                                                                        temp_b = temp_b +1;
 									end
 								2'd2: begin
-									temp_a = temp_a +1;
-									temp_b = temp_b +1;
+									RES <= temp_a * temp_b;
+									
 									end
 								2'd3: begin
-									RES <= temp_a * temp_b;
+									
 									count <= 0;
 								end
 								default: count <= 0;
@@ -195,16 +223,17 @@ module ALU2 #(parameter WIDTH = 8)(CLK,RST,INP_VALID,MODE,CMD,CE,OPA,OPB,CIN,RES
 
 						4'd10: begin
 							if(INP_VALID == 2'b11) begin
+							temp_a <= OPA;
+                                                        temp_b <= OPB;
 							case(count)
                                                                 2'd1: begin
-                                                                        temp_a <= OPA;
-                                                                        temp_b <= OPB;
-                                                                        end
-                                                                2'd2: begin
                                                                         temp = temp_a << 1;
                                                                         end
+                                                                2'd2: begin
+                                                                         RES <= temp * temp_b;
+                                                                        end
                                                                 2'd3: begin
-                                                                        RES <= temp * temp_b;
+                                                                       
                                                                         count <= 0;
                                                                 	end
 								default : count <=0;
@@ -220,8 +249,11 @@ module ALU2 #(parameter WIDTH = 8)(CLK,RST,INP_VALID,MODE,CMD,CE,OPA,OPB,CIN,RES
 							signed_a = OPA;
 							signed_b = OPB;
 							if(INP_VALID == 2'b11) begin
-								RES = signed_a + signed_b;	
-								OFLOW = (signed_a[WIDTH-1]==signed_b[WIDTH-1]) && (RES[WIDTH] != signed_a[WIDTH-1]);
+								RES <= signed_a + signed_b;	
+								OFLOW <= (signed_a[WIDTH-1]==signed_b[WIDTH-1]) && (sum[WIDTH] != signed_a[WIDTH-1]);
+								L <= signed_a<signed_b;
+                                                                E <= signed_a == signed_b;
+                                                                G <= signed_a>signed_b;
 							end
 							else begin
 								RES <= WIDTH{0};
@@ -233,33 +265,18 @@ module ALU2 #(parameter WIDTH = 8)(CLK,RST,INP_VALID,MODE,CMD,CE,OPA,OPB,CIN,RES
                                                         signed_a = OPA;
                                                         signed_b = OPB;
                                                         if(INP_VALID == 2'b11) begin
-                                                                RES = signed_a + signed_b;
-                                                                OFLOW = (signed_a[WIDTH-1]==signed_b[WIDTH-1]) && (RES[WIDTH] != signed_a[WIDTH-1]);
-								L = RES[WIDTH] ^ OFLOW;
-								E = signed_a == signed_b;
-								G = ~(L&E);
+                                                                RES <= signed_a + signed_b;
+                                                                OFLOW <= (signed_a[WIDTH-1]==signed_b[WIDTH-1]) && (sum[WIDTH] != signed_a[WIDTH-1]);
+								L <= signed_a<signed_b;
+								E <= signed_a == signed_b;
+								G <= signed_a>signed_b;
                                                         end
                                                         else begin
                                                                 RES <= WIDTH{0};
                                                                 ERR <= 1;
                                                         end
                                                         end
-						4'd13: begin
-                                                        COUT = 0;
-                                                        signed_a = OPA;
-                                                        signed_b = OPB;
-                                                        if(INP_VALID == 2'b11) begin
-                                                                RES = signed_a - signed_b;
-                                                                OFLOW = (signed_a[WIDTH-1]!=signed_b[WIDTH-1]) && (RES[WIDTH] != signed_a[WIDTH-1]);
-                                                                L = RES[WIDTH] ^ OFLOW;
-                                                                E = signed_a == signed_b;
-                                                                G = ~(L&E);
-                                                        end
-                                                        else begin
-                                                                RES <= WIDTH{0};
-                                                                ERR <= 1;
-                                                        end
-                                                        end
+           
 						default:begin
 							 RES<= WIDTH{0};
 							 ERR <= 1;
@@ -270,11 +287,11 @@ module ALU2 #(parameter WIDTH = 8)(CLK,RST,INP_VALID,MODE,CMD,CE,OPA,OPB,CIN,RES
 				
 				else begin // LOGICAL OPERATION
 					 case(CMD)
-                                                4'd0: begin
+                                                4'd0: begin//AND
                                                         case(INP_VALID)
                                                                 2'b11: begin
 
-                                                                        RES = OPA & OPB;
+                                                                        RES <= OPA & OPB;
                                                                    
                                                                         end
                                                                 default : begin
@@ -283,20 +300,20 @@ module ALU2 #(parameter WIDTH = 8)(CLK,RST,INP_VALID,MODE,CMD,CE,OPA,OPB,CIN,RES
                                                                         end
                                                         endcase
 
-                                                4'd1: begin
+                                                4'd1: begin//NAND
                                                         case(INP_VALID)
                                                                 2'b11: begin
-                                                                        RES <= OPA | OPB;
+                                                                        RES <= ~(OPA & OPB);
                                                                         end
                                                                 default : begin
                                                                                 RES <= WIDTH{0};
                                                                                 ERR <= 1;
                                                                         end
                                                         endcase
-                                                4'd2: begin
+                                                4'd2: begin//OR
                                                         case(INP_VALID)
                                                                 2'b11: begin
-                                                                        RES <= ~(OPA | OPB);
+                                                                        RES <= (OPA | OPB);
                                                                         
                                                                         end
                                                                 default : begin
@@ -304,10 +321,10 @@ module ALU2 #(parameter WIDTH = 8)(CLK,RST,INP_VALID,MODE,CMD,CE,OPA,OPB,CIN,RES
                                                                                 ERR <= 1;
                                                                         end
                                                         endcase
-                                                4'd3: begin
+                                                4'd3: begin//NOR
                                                         case(INP_VALID)
                                                                 2'b11: begin
-                                                                        {COUT,RES} <= OPA - OPB - CIN;
+                                                                        RES <= ~(OPA | OPB);
                                                                         ERR <= 0;
                                                                         end
                                                                 default : begin
@@ -316,160 +333,126 @@ module ALU2 #(parameter WIDTH = 8)(CLK,RST,INP_VALID,MODE,CMD,CE,OPA,OPB,CIN,RES
                                                                         end
                                                         endcase
 
-                                                4'd4: begin
-
-                                                        if(INP_VALID[0] == 1) begin
-                                                                temp = OPA +1;
-                                                                RES <= temp;
-                                                                ERR <=0;
-                                                        else
-                                                        else begin
-                                                                 RES <= WIDTH{0};
-                                                                 ERR <= 1;
-                                                        end
-                                                      end
-                                                4'd5: begin
-                                                        if(INP_VALID[0] == 1) begin
-                                                                temp = OPA -1;
-                                                                RES <= temp;
-                                                                ERR <=0;
-                                                        else
-                                                        else begin
-                                                                 RES <= WIDTH{0};
-                                                                 ERR <= 1;
-                                                        end
-                                                      end
-
-                                                4'd6: begin
-                                                        if(INP_VALID[1] == 1) begin
-                                                                temp = OPB +1;
-                                                                RES <= temp;
-                                                                ERR <=0;
-                                                        else
-                                                        else begin
-                                                                 RES <= WIDTH{0};
-                                                                 ERR <= 1;
-                                                        end
-                                                      end
-                                                4'd7: begin
-                                                        if(INP_VALID[1] == 1) begin
-
-                                                                temp = OPB -1;
-                                                                RES <= temp;
-                                                                ERR <=0;
-                                                        else
-                                                        else begin
-                                                                 RES <= WIDTH{0};
-                                                                 ERR <= 1;
-                                                        end
-                                                      end
-                                                4'd8: begin
+                                                4'd4: begin//XOR
                                                         case(INP_VALID)
                                                                 2'b11: begin
-                                                                        {G,E,L} = {(OPA>OPB),(OPA==OPB),(OPA<OPB)};
+                                                                        RES <= (OPA ^ OPB);
+                                                                        ERR <= 0;
                                                                         end
-                                                                default:
-                                                                        {G,E,L} = 3'b000;
-                                                                        ERR =1;
+                                                                default : begin
+                                                                                RES <= WIDTH{0};
+                                                                                ERR <= 1;
+                                                                        end
                                                         endcase
-                                                4'd9: begin
-
-                                                        if(INP_VALIF == 2'b11) begin
-
-                                                        case(count)
-                                                                2'd1: begin
-                                                                        temp_a <= OPA;
-                                                                        temp_b <= OPB;
+						4'd5: begin//XNOR
+                                                        case(INP_VALID)
+                                                                2'b11: begin
+                                                                        RES <= ~(OPA ^ OPB);
+                                                                        ERR <= 0;
                                                                         end
-                                                                2'd2: begin
-                                                                        temp_a++;
-                                                                        temp_b++;
+                                                                default : begin
+                                                                                RES <= WIDTH{0};
+                                                                                ERR <= 1;
                                                                         end
-                                                                2'd3: begin
-                                                                        RES <= temp_a * temp_b;
-                                                                        count <= 0;
-                                                                end
-                                                                default: count <= 0;
                                                         endcase
-                                                        end
-
-                                                        else begin
-                                                                RES <= WIDTH{0};
-                                                                ERR <= 1;
-                                                        end
-
-
-                                                4'd10: begin
-                                                        if(INP_VALID == 2'b11) begin
-                                                        case(count)
-                                                                2'd1: begin
-                                                                        temp_a <= OPA;
-                                                                        temp_b <= OPB;
+                                                4'd6: begin //NOT_A
+                                                        if(INP_VALID==2'b01 || INP_VALID == 2'b11)begin
+                                                                        RES <= ~(OPA);
+                                                                        ERR <= 0;
                                                                         end
-                                                                2'd2: begin
-                                                                        temp = temp_a << 1;
+                                                                else begin
+                                                                                RES <= WIDTH{0};
+                                                                                ERR <= 1;
                                                                         end
-                                                                2'd3: begin
-                                                                        RES <= temp * temp_b;
-                                                                        count <= 0;
+                                                        end
+                                                4'd7: begin//NOT_B
+                                                        if(INP_VALID==2'b10 || INP_VALID == 2'b11)begin
+                                                                        RES <= ~(OPB);
+                                                                        ERR <= 0;
                                                                         end
-                                                                default : count <=0;
-                                                        endcase
+                                                                else begin
+                                                                                RES <= WIDTH{0};
+                                                                                ERR <= 1;
+                                                                        end
                                                         end
-                                                        else begin
-                                                                RES <= WIDTH{0};
-                                                                ERR <= 1;
+						4'd8: begin//shftR1_A
+                                                        if(INP_VALID==2'b01 || INP_VALID == 2'b11)begin
+                                                                      
+									  RES <= OPA >>1;
+                                                                        ERR <= 0;
+                                                                        end
+                                                                else begin
+                                                                                RES <= WIDTH{0};
+                                                                                ERR <= 1;
+                                                                        end
                                                         end
+						4'd8: begin//shftL1_A
+                                                        if(INP_VALID==2'b01 || INP_VALID == 2'b11)begin
+                                                                      
+                                                                          RES <= OPA <<1;
+                                                                        ERR <= 0;
+                                                                        end
+                                                                else begin
+                                                                                RES <= WIDTH{0};
+                                                                                ERR <= 1;
+                                                                        end
+                                                        end
+						4'd10: begin//ShftR1_B
+                                                        if(INP_VALID==2'b10 || INP_VALID == 2'b11)begin
+                                                                          RES <= OPB >>1;
+                                                                        ERR <= 0;
+                                                                        end
+                                                                else begin
+                                                                                RES <= WIDTH{0};
+                                                                                ERR <= 1;
+                                                                        end
+                                                        end
+						4'd11: begin//ShftL1_B
+                                                        if(INP_VALID==2'b10 || INP_VALID == 2'b11)begin
+                                                                          RES <= OPB <<1;
+                                                                        ERR <= 0;
+                                                                        end
+                                                                else begin
+                                                                                RES <= WIDTH{0};
+                                                                                ERR <= 1;
+                                                                        end
+                                                        end
+						12: case(INP_VALID)
+        						3: begin
+           						 if (|(OPB[(2*WIDTH)-1 : WIDTH])) begin
+                						ERR <= 1'b1;
+            						end
+            						else begin
+                						ERR <= 1'b0;
+                						RES[WIDTH-1:0] <= (OPA << (OPB % WIDTH)) | (OPA >> (WIDTH - (OPB % WIDTH)));
+                						RES[(2*WIDTH)-1 : WIDTH] <= 0;
+            							end
+        						end
+        						default: begin
+            							RES <= 0;	
+            							ERR <= 1;
+        						end
+    							endcase
 
-                                                4'd11: begin
-                                                        COUT = 0;
-                                                        signed_a = OPA;
-                                                        signed_b = OPB;
-                                                        if(INP_VALID == 2'b11) begin
-                                                                RES = signed_a + signed_b;
-                                                                OFLOW = (signed_a[WIDTH-1]==signed_b[WIDTH-1]) && (RES[WIDTH] != signed_a[WIDTH-1]);
-                                                        end
-                                                        else begin
-                                                                RES <= WIDTH{0};
-                                                                ERR <= 1;
-                                                        end
-                                                        end
-                                                4'd12: begin
-                                                        COUT = 0;
-                                                        signed_a = OPA;
-                                                        signed_b = OPB;
-                                                        if(INP_VALID == 2'b11) begin
-                                                                RES = signed_a + signed_b;
-                                                                OFLOW = (signed_a[WIDTH-1]==signed_b[WIDTH-1]) && (RES[WIDTH] != signed_a[WIDTH-1]);
-                                                                L = RES[WIDTH] ^ OFLOW;
-                                                                E = signed_a == signed_b;
-                                                                G = ~(L&E);
-                                                        end
-                                                        else begin
-                                                                RES <= WIDTH{0};
-                                                                ERR <= 1;
-                                                        end
-                                                        end
-                                                4'd13: begin
-                                                        COUT = 0;
-                                                        signed_a = OPA;
-                                                        signed_b = OPB;
-                                                        if(INP_VALID == 2'b11) begin
-                                                                RES = signed_a - signed_b;
-                                                                OFLOW = (signed_a[WIDTH-1]!=signed_b[WIDTH-1]) && (RES[WIDTH] != signed_a[WIDTH-1]);
-                                                                L = RES[WIDTH] ^ OFLOW;
-                                                                E = signed_a == signed_b;
-                                                                G = ~(L&E);
-                                                        end
-                                                        else begin
-                                                                RES <= WIDTH{0};
-                                                                ERR <= 1;
-                                                        end
-                                                        end
-                                                default:begin
+						13: case(INP_VALID)
+        						3: begin
+            						if (|(OPB[(2*WIDTH)-1 : WIDTH])) begin
+                						ERR <= 1'b1;
+            						end
+            						else begin
+                						ERR <= 1'b0;
+                						RES[WIDTH-1:0] <= (OPA >> (OPB % WIDTH)) | (OPA << (WIDTH - (OPB % WIDTH)));
+                						RES[(2*WIDTH)-1 : WIDTH] <= 0;
+            						end
+        						end
+						endcase
+						default:begin
                                                          RES<= WIDTH{0};
                                                          ERR <= 1;
                                                         end
 
                                         endcase
                                 end
+			end
+		end
+endmodule
