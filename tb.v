@@ -115,11 +115,7 @@ module test;
     
   end
   
-   initial begin
-       
-        $dumpfile("alu_waveform.vcd");
-        $dumpvars(0, tb_alu_design);
-   end
+
   initial 
     $monitor("T=%0t | MODE=%0d CMD=%0d | A=%0d B=%0d CIN=%0d VALID=%b | RES=%0d COUT=%0d OF=%0d G=%0d L=%0d E=%0d ERR=%0d",$time, MODE, CMD, OPA, OPB, CIN, INP_VALID,RES, COUT, OFLOW, G, L, E, ERR);
   
