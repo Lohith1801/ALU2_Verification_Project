@@ -1,458 +1,289 @@
-module ALU2 #(parameter WIDTH = 8)(CLK,RST,INP_VALID,MODE,CMD,CE,OPA,OPB,CIN,RES,OFLOW,COUT,G,L,E,ERR);
-	
-	//input ports
-	input CLK, RST,MODE,CE;
-	input [1:0]INP_VALID
-	input [3:0]CMD;
-	input [WIDTH-1:0]OPA, OPB;
-	input CIN;
+module ALU2 #(parameter WIDTH = 8)(
+    //input ports
+    input CLK, RST, MODE, CE,
+    input [1:0] INP_VALID,
+    input [3:0] CMD,
+    input [WIDTH-1:0] OPA, OPB,
+    input CIN,
+    
+    //output ports
+    output reg [2*WIDTH-1:0] RES,
+    output reg OFLOW, COUT, G, L, E, ERR
+);
+    //intermediate or temporary memories
+    reg [1:0] count;
+    reg [WIDTH-1:0] temp_a, temp_b;
+    reg signed [WIDTH-1:0] signed_a, signed_b;
+    
+    //signed addition wiring
+    wire [WIDTH:0] sum_ext;
+    assign sum_ext = $signed(OPA) + $signed(OPB);
 
-	//counter and temporary variables
-	reg [1:0]count;
-	reg [WIDTH-1:0]temp_a, temp_b, temp;
-	reg signed [WIDTH-1:0]signed_a, signed_b;
-	reg temp_OFLOW, temp_G, temp_L, temp_E, temp_ERR, temp_COUT;
-	wire [WIDTH -1 :0]sum;
+    //counter logic for Arithmatic CMD =9 and CMD=10
+    always @(posedge CLK or posedge RST) begin
+        if (RST)
+            count <= 0;
+        else if (MODE && (CMD == 4'd9 || CMD == 4'd10))
+            count <= count + 1;
+        else
+            count <= 0;
+    end
 
-        //output ports
-	output reg [WIDTH*2 -1:0]RES;
-	output reg OFLOW, COUT, G, L, E, ERR;
-	sum = $signed(OPA) + $signed(OPB);
-	always@(posedge CLK) begin
-		if(MODE == 1) begin
-			if(CMD == 4'd9) begin
-				if(count != 0) begin
-					count =0;
-					count = count +1;
-				end
-				else begin
-					if(count == 2'd3)
-						count =0;
-					else
-						count = count + 1;
-				end
-			end
-			else if(CMD == 4'd10) begin
-                                if(count != 0) begin
-                                        count =0;
-                                        count = count +1;
-                                end
-                                else begin
-                                        if(count == 2'd3)
-                                                count =0;
-                                        else
-                                                count = count + 1;
-                                end
+    //ALU logic
+    always @(posedge CLK or posedge RST) begin
+        if (RST) begin //RST logic
+            RES   <= 0;
+            OFLOW <= 0;
+            COUT  <= 0;
+            G <= 0; 
+            L <= 0; 
+            E <= 0;
+            ERR <= 0;
+        end
+        else if (CE) begin //Clock enable logic
+            
+            // initializing default values
+            RES   <= 0;
+            OFLOW <= 0;
+            COUT  <= 0;
+            G <= 0; 
+            L <= 0; 
+            E <= 0;
+            ERR <= 0;
+
+            if (MODE) begin //ARITMATIC OPERATIONS
+                case (CMD)
+
+                    4'd0: begin//Addition
+                        if (INP_VALID == 2'b11)
+                            {COUT, RES[WIDTH-1:0]} <= OPA + OPB;
+                        else 
+                            ERR <= 1;
+                    end
+
+                    4'd1: begin//subtraction
+                        if (INP_VALID == 2'b11)
+                            RES[WIDTH-1:0] <= OPA - OPB;
+                        else 
+                            ERR <= 1;
+                    end
+
+                    4'd2: begin//Addition with CIN
+                        if (INP_VALID == 2'b11)
+                            {COUT, RES[WIDTH-1:0]} <= OPA + OPB + CIN;
+                        else 
+                            ERR <= 1;
+                    end
+
+                    4'd3: begin//Subtraction with CIN
+                        if (INP_VALID == 2'b11)
+                            RES[WIDTH-1:0] <= OPA - OPB - CIN;
+                        else 
+                            ERR <= 1;
+                    end
+
+                    4'd4: begin//increment A
+                        if (INP_VALID[0])
+                            RES[WIDTH-1:0] <= OPA + 1;
+                        else 
+                            ERR <= 1;
+                    end
+
+                    4'd5: begin//decrement A
+                        if (INP_VALID[0])
+                            RES[WIDTH-1:0] <= OPA - 1;
+                        else 
+                            ERR <= 1;
+                    end
+
+                    4'd6: begin// Increment B
+                        if (INP_VALID[1])
+                            RES[WIDTH-1:0] <= OPB + 1;
+                        else 
+                            ERR <= 1;
+                    end
+
+                    4'd7: begin//Decrement B
+                        if (INP_VALID[1])
+                            RES[WIDTH-1:0] <= OPB - 1;
+                        else 
+                            ERR <= 1;
+                    end
+
+                    4'd8: begin//CMP
+                        if (INP_VALID == 2'b11) begin
+                            G <= (OPA > OPB);
+                            E <= (OPA == OPB);
+                            L <= (OPA < OPB);
+                        end 
+                            else ERR <= 1;
+                    end
+
+                    4'd9: begin// Incremented Multiplication
+                        if (INP_VALID == 2'b11) begin
+                            if (count == 2'd1) begin
+                                temp_a <= OPA + 1;
+                                temp_b <= OPB + 1;
+                            end
+                            else if (count == 2'd2)
+                                RES <= temp_a * temp_b;
+                        end 
+                            else ERR <= 1;
+                    end
+
+                    4'd10: begin//Shifted multiplication
+                        if (INP_VALID == 2'b11) begin
+                            if (count == 2'd1)
+                                temp_a <= OPA << 1;
+                            else if (count == 2'd2)
+                                RES <= temp_a * OPB;
+                        end 
+                        else
+                             ERR <= 1;
+                    end
+
+                    4'd11: begin//Signed addition
+                        signed_a = OPA;
+                        signed_b = OPB;
+                        if (INP_VALID == 2'b11) begin
+                            RES <= signed_a + signed_b;
+                            OFLOW <= (signed_a[WIDTH-1] == signed_b[WIDTH-1]) &&
+                                     (sum_ext[WIDTH] != signed_a[WIDTH-1]);
+                            G <= signed_a > signed_b;
+                            E <= signed_a == signed_b;
+                            L <= signed_a < signed_b;
+                        end 
+                        else 
+                            ERR <= 1;
+                    end
+
+                    4'd12: begin//signed subtraction
+                        signed_a = OPA;
+                        signed_b = OPB;
+                        if (INP_VALID == 2'b11) begin
+                            RES <= signed_a - signed_b;
+                            OFLOW <= (signed_a[WIDTH-1] != signed_b[WIDTH-1]) &&
+                                     (sum_ext[WIDTH] != signed_a[WIDTH-1]);
+                            G <= signed_a > signed_b;
+                            E <= signed_a == signed_b;
+                            L <= signed_a < signed_b;
+                        end 
+                        else 
+                            ERR <= 1;
+                    end
+
+                    default: ERR <= 1;
+
+                endcase
+            end
+
+            else begin // LOGICAL OPERATIONN
+                case (CMD)
+
+                     4'd0: begin //AND
+                         if (INP_VALID==2'b11) 
+                            RES <= OPA & OPB; 
+                         else 
+                            ERR<=1;
                         end
-					
-					
-			
-		end
-	end
 
-	always@(posedge CLK or posedge RST) begin
-		if(RST) begin
-			RES <= WIDTH{0};
-			OFLOW <=0;
-			COUT <=0;
-			G <=0;
-			L<=0;
-			E<=0;
-			ERR <=0;
-			count <= 0;
-		end
-		
-		else begin
-			if(~CE) begin
-				RES <= RES;
-				OFLOW <= OFLOW;
-				COUT <= COUT;
-				G <=G;
-				L<=L;
-				E <=E;
-				ERR <=ERR;
-			end
-			
-			else begin
-				if(MODE) begin  //ARITHMATIC OPERATION
-					RES <= WIDTH{0};
-                        		OFLOW <=0;
-                        		COUT <=0;
-                        		G <=0;
-                        		L<=0;
-                        		E<=0;
-                        		ERR <=0;
-                        		count <= 0;
-					
-					case(CMD)
-						4'd0: begin // Addition
-							case(INP_VALID)
-								2'b11: begin
-									
-									{temp_COUT,temp} = OPA + OPB;
-									RES <= temp;
-									COUT <= temp_COUT; 
-									ERR <= 0;
-									end
-								default : begin
-										RES <= WIDTH{0};
-										ERR <= 1;
-									end
-							endcase
-						
-						4'd1: begin //Subtraction
-							case(INP_VALID)
-                                                                2'b11: begin
-                                                                        RES <= OPA - OPB;
-                                                                        ERR <= 0;
-                                                                        end
-                                                                default : begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        endcase
-						4'd2: begin //Addition with CIN
-							case(INP_VALID)
-                                                                2'b11: begin
-                                                                        {temp_COUT,temp} = OPA + OPB + CIN;
-                                                                        COUT <= temp_COUT;
-									RES <= temp;
-									ERR <= 0;
-                                                                        end
-                                                                default : begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        endcase
-						4'd3: begin // Subtraction with CIN
-							case(INP_VALID)
-                                                                2'b11: begin
-                                                                        RES <= OPA - OPB - CIN;
-                                                                        ERR <= 0;
-                                                                        end
-                                                                default : begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        endcase
+                    4'd1: begin//NAND
+                          if (INP_VALID==2'b11) 
+                            RES <= ~(OPA & OPB); 
+                          else 
+                            ERR<=1;
+                        end
 
-						4'd4: begin //Increment_A
-							
-							if(INP_VALID[0] == 1) begin
-								temp = OPA +1;
-								RES <= temp;
-								ERR <=0;
-							else
-							else begin
-								 RES <= WIDTH{0};
-                                                                 ERR <= 1;
-                                                        end
-                                                      end
-						4'd5: begin //Decrement_A
-                                                        if(INP_VALID[0] == 1) begin
-                                                               	temp = OPA -1;
-								RES <= temp;
-                                                                ERR <=0;
-                                                        else
-                                                        else begin
-                                                                 RES <= WIDTH{0};
-                                                                 ERR <= 1;
-                                                        end
-                                                      end	
+                    4'd2: begin//OR
+                            if (INP_VALID==2'b11) 
+                                RES <= OPA | OPB; 
+                            else 
+                                ERR<=1;
+                    end
 
-						4'd6: begin //Increment_B
-                                                        if(INP_VALID[1] == 1) begin
-                                                                temp = OPB +1;
-								RES <= temp;
-                                                                ERR <=0;
-                                                        else
-                                                        else begin
-                                                                 RES <= WIDTH{0};
-                                                                 ERR <= 1;
-                                                        end
-                                                      end
-						4'd7: begin //Decrement_B
-                                                        if(INP_VALID[1] == 1) begin
-                                                               
-								temp = OPB -1;
-								RES <= temp;
-                                                                ERR <=0;
-                                                        else
-                                                        else begin
-                                                                 RES <= WIDTH{0};
-                                                                 ERR <= 1;
-                                                        end
-                                                      end
-						4'd8: begin //CMP
-                                                        case(INP_VALID)
-								2'b11: begin
-									{G,E,L} = {(OPA>OPB),(OPA==OPB),(OPA<OPB)};					
-									end
-								default:begin
-									{G,E,L} = 3'b000;
-									ERR =1;
-									end
-							endcase
-						4'd9: begin //Multiplication with incremented inputs
-							
-							if(INP_VALIF == 2'b11) begin
-								temp_a = OPA;
-								temp_b = OPB;
-							case(count)
-								2'd1: begin
-									temp_a = temp_a +1;
-                                                                        temp_b = temp_b +1;
-									end
-								2'd2: begin
-									RES <= temp_a * temp_b;
-									
-									end
-								2'd3: begin
-									
-									count <= 0;
-								end
-								default: count <= 0;
-							endcase
-							end
-							
-							else begin
-								RES <= WIDTH{0};
-								ERR <= 1;
-							end	
-					
+                    4'd3: begin//NOR
+                            if (INP_VALID==2'b11) 
+                                RES <= ~(OPA | OPB); 
+                            else 
+                                ERR<=1;
+                    end
 
-						4'd10: begin
-							if(INP_VALID == 2'b11) begin
-							temp_a <= OPA;
-                                                        temp_b <= OPB;
-							case(count)
-                                                                2'd1: begin
-                                                                        temp = temp_a << 1;
-                                                                        end
-                                                                2'd2: begin
-                                                                         RES <= temp * temp_b;
-                                                                        end
-                                                                2'd3: begin
-                                                                       
-                                                                        count <= 0;
-                                                                	end
-								default : count <=0;
-                                                        endcase
-							end
-							else begin
-                                                                RES <= WIDTH{0};
-                                                                ERR <= 1;
-                                                        end
-								
-                                                4'd11: begin
-							COUT = 0;
-							signed_a = OPA;
-							signed_b = OPB;
-							if(INP_VALID == 2'b11) begin
-								RES <= signed_a + signed_b;	
-								OFLOW <= (signed_a[WIDTH-1]==signed_b[WIDTH-1]) && (sum[WIDTH] != signed_a[WIDTH-1]);
-								L <= signed_a<signed_b;
-                                                                E <= signed_a == signed_b;
-                                                                G <= signed_a>signed_b;
-							end
-							else begin
-								RES <= WIDTH{0};
-								ERR <= 1;
-							end
-							end
-						4'd12: begin
-                                                        COUT = 0;
-                                                        signed_a = OPA;
-                                                        signed_b = OPB;
-                                                        if(INP_VALID == 2'b11) begin
-                                                                RES <= signed_a + signed_b;
-                                                                OFLOW <= (signed_a[WIDTH-1]==signed_b[WIDTH-1]) && (sum[WIDTH] != signed_a[WIDTH-1]);
-								L <= signed_a<signed_b;
-								E <= signed_a == signed_b;
-								G <= signed_a>signed_b;
-                                                        end
-                                                        else begin
-                                                                RES <= WIDTH{0};
-                                                                ERR <= 1;
-                                                        end
-                                                        end
-           
-						default:begin
-							 RES<= WIDTH{0};
-							 ERR <= 1;
-							end
-				
-					endcase
-				end
-				
-				else begin // LOGICAL OPERATION
-					 case(CMD)
-                                                4'd0: begin//AND
-                                                        case(INP_VALID)
-                                                                2'b11: begin
+                    4'd4: begin//XOR
+                            if (INP_VALID==2'b11) 
+                                   RES <= OPA ^ OPB; 
+                            else 
+                                    ERR<=1;
+                    end
 
-                                                                        RES <= OPA & OPB;
-                                                                   
-                                                                        end
-                                                                default : begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        endcase
+                    4'd5: begin//XNOR
+                            if (INP_VALID==2'b11) 
+                                    RES <= ~(OPA ^ OPB); 
+                            else 
+                                    ERR<=1;
+                    end
 
-                                                4'd1: begin//NAND
-                                                        case(INP_VALID)
-                                                                2'b11: begin
-                                                                        RES <= ~(OPA & OPB);
-                                                                        end
-                                                                default : begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        endcase
-                                                4'd2: begin//OR
-                                                        case(INP_VALID)
-                                                                2'b11: begin
-                                                                        RES <= (OPA | OPB);
-                                                                        
-                                                                        end
-                                                                default : begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        endcase
-                                                4'd3: begin//NOR
-                                                        case(INP_VALID)
-                                                                2'b11: begin
-                                                                        RES <= ~(OPA | OPB);
-                                                                        ERR <= 0;
-                                                                        end
-                                                                default : begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        endcase
+                    4'd6: begin//NOT A
+                        if (INP_VALID[0]) 
+                            RES <= ~OPA; 
+                        else 
+                            ERR<=1;
+                    end
 
-                                                4'd4: begin//XOR
-                                                        case(INP_VALID)
-                                                                2'b11: begin
-                                                                        RES <= (OPA ^ OPB);
-                                                                        ERR <= 0;
-                                                                        end
-                                                                default : begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        endcase
-						4'd5: begin//XNOR
-                                                        case(INP_VALID)
-                                                                2'b11: begin
-                                                                        RES <= ~(OPA ^ OPB);
-                                                                        ERR <= 0;
-                                                                        end
-                                                                default : begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        endcase
-                                                4'd6: begin //NOT_A
-                                                        if(INP_VALID==2'b01 || INP_VALID == 2'b11)begin
-                                                                        RES <= ~(OPA);
-                                                                        ERR <= 0;
-                                                                        end
-                                                                else begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        end
-                                                4'd7: begin//NOT_B
-                                                        if(INP_VALID==2'b10 || INP_VALID == 2'b11)begin
-                                                                        RES <= ~(OPB);
-                                                                        ERR <= 0;
-                                                                        end
-                                                                else begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        end
-						4'd8: begin//shftR1_A
-                                                        if(INP_VALID==2'b01 || INP_VALID == 2'b11)begin
-                                                                      
-									  RES <= OPA >>1;
-                                                                        ERR <= 0;
-                                                                        end
-                                                                else begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        end
-						4'd9: begin//shftL1_A
-                                                        if(INP_VALID==2'b01 || INP_VALID == 2'b11)begin
-                                                                      
-                                                                          RES <= OPA <<1;
-                                                                        ERR <= 0;
-                                                                        end
-                                                                else begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        end
-						4'd10: begin//ShftR1_B
-                                                        if(INP_VALID==2'b10 || INP_VALID == 2'b11)begin
-                                                                          RES <= OPB >>1;
-                                                                        ERR <= 0;
-                                                                        end
-                                                                else begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        end
-						4'd11: begin//ShftL1_B
-                                                        if(INP_VALID==2'b10 || INP_VALID == 2'b11)begin
-                                                                          RES <= OPB <<1;
-                                                                        ERR <= 0;
-                                                                        end
-                                                                else begin
-                                                                                RES <= WIDTH{0};
-                                                                                ERR <= 1;
-                                                                        end
-                                                        end
-						12: case(INP_VALID)
-        						3: begin
-           						 if (|(OPB[(2*WIDTH)-1 : WIDTH])) begin
-                						ERR <= 1'b1;
-            						end
-            						else begin
-                						ERR <= 1'b0;
-                						RES[WIDTH-1:0] <= (OPA << (OPB % WIDTH)) | (OPA >> (WIDTH - (OPB % WIDTH)));
-                						RES[(2*WIDTH)-1 : WIDTH] <= 0;
-            							end
-        						end
-        						default: begin
-            							RES <= 0;	
-            							ERR <= 1;
-        						end
-    							endcase
+                    4'd7: begin//NOT B
+                        if (INP_VALID[1]) 
+                                RES <= ~OPB; 
+                        else 
+                                ERR<=1;
+                    end
 
-						13: case(INP_VALID)
-        						3: begin
-            						if (|(OPB[(2*WIDTH)-1 : WIDTH])) begin
-                						ERR <= 1'b1;
-            						end
-            						else begin
-                						ERR <= 1'b0;
-                						RES[WIDTH-1:0] <= (OPA >> (OPB % WIDTH)) | (OPA << (WIDTH - (OPB % WIDTH)));
-                						RES[(2*WIDTH)-1 : WIDTH] <= 0;
-            						end
-        						end
-						endcase
-						default:begin
-                                                         RES<= WIDTH{0};
-                                                         ERR <= 1;
-                                                        end
+                    4'd8: begin//SHFTR1_A
+                        if (INP_VALID[0]) 
+                                RES <= OPA >> 1; 
+                        else 
+                                ERR<=1;
+                    end
 
-                                        endcase
-                                end
-			end
-		end
+                    4'd9: begin//SHFTL1_A
+                        if (INP_VALID[0]) 
+                                RES <= OPA << 1; 
+                        else 
+                            ERR<=1;
+                    end
+
+                    4'd10: begin//SHFTR1_B
+                         if (INP_VALID[1]) 
+                            RES <= OPB >> 1; 
+                         else 
+                              ERR<=1;
+                    end
+
+                    4'd11: begin//SHFTL1_B
+                        if (INP_VALID[1]) 
+                            RES <= OPB << 1; 
+                        else ERR<=1;
+                    end
+
+                    4'd12: begin//ROtate left
+                        if (INP_VALID==2'b11)
+                            RES[WIDTH-1:0] <= (OPA << (OPB % WIDTH)) | (OPA >> (WIDTH - (OPB % WIDTH)));
+                        else 
+                            ERR<=1;
+                    end
+
+                    4'd13: begin//rotate right
+                        if (INP_VALID==2'b11)
+                         RES[WIDTH-1:0] <= (OPA >> (OPB % WIDTH)) | (OPA << (WIDTH - (OPB % WIDTH)));
+                        else 
+                            ERR<=1;
+                     end
+
+
+
+                    default: ERR <= 1;
+
+                endcase
+            end
+        end
+    end
+
 endmodule
