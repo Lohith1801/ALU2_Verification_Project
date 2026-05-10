@@ -55,6 +55,7 @@ module ALU2 #(parameter WIDTH = 8)(
             COUT  <= 0;
             CIN_w <= CIN;
             G <= 0; 
+			RES <= 0;
             L <= 0; 
             E <= 0;
             ERR <= 0;
@@ -154,7 +155,7 @@ module ALU2 #(parameter WIDTH = 8)(
                       signed_a = $signed(OPA_w);
                       signed_b = $signed(OPB_w);
                         if (INP_VALID_w == 2'b11) begin
-                            RES <= signed_a + signed_b;
+							{COUT,RES[WIDTH-1:0]} <= signed_a + signed_b;
                             OFLOW <= (signed_a[WIDTH-1] == signed_b[WIDTH-1]) &&
                                      (sum_ext[WIDTH] != signed_a[WIDTH-1]);
                             G <= signed_a > signed_b;
