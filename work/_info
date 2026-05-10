@@ -9,119 +9,150 @@ z2
 cModel Technology
 Z0 d/fetools/work_area/frontend/Batch_11/LohithKS/ALU2_Verification_Project
 T_opt
-!s110 1778091693
-ViYYO:[D@oB0d<]LnYR9M20
-04 4 4 work test fast 0
-=1-6805caf5892e-69fb86ad-3187d-29e94
-o-quiet -auto_acc_if_foreign -work work
-Z1 tCvgOpt 0
+!s110 1778404437
+V]hgGI9PJ0PQI?if@JJa511
+Z1 04 4 4 work test fast 0
+=1-6805caf5892e-6a004c55-d09f4-190b1
+Z2 o-quiet -auto_acc_if_foreign -work work
+Z3 tCvgOpt 0
 n@_opt
-OE;O;10.6c;65
+Z4 OE;O;10.6c;65
 R0
+T_opt1
+!s110 1778404931
+Vj@jY>kFko2g?>g3=b]kiE1
+R1
+=1-6805caf5892e-6a004e43-b785-1a5cc
+R2
+R3
+n@_opt1
+R4
 vALU2
-Z2 !s110 1778091688
+!s110 1778404057
 !i10b 1
-!s100 K^PX:AXPVGRSY1MOLk7Gc0
-IgOegOoMPo]m=k<^^A>_EM2
-Z3 VDg1SIo80bB@j0V0VzS_@n1
+!s100 AK`_DL^7bR<5L^A6DO9:=3
+IgH^cf1PAZm^e<iT:Gh?]b2
+Z5 VDg1SIo80bB@j0V0VzS_@n1
 R0
-w1778091385
+w1778392704
 8ALU2_Design.v
 FALU2_Design.v
 L0 1
-Z4 OE;L;10.6c;65
+Z6 OE;L;10.6c;65
 r1
 !s85 0
 31
-Z5 !s108 1778091688.000000
-Z6 !s107 tb.v|ALU2_Design.v|
-Z7 !s90 ALU2_Design.v|tb.v|
+!s108 1778404057.000000
+!s107 reference_model.v|TOP_tb.v|mon_scr.v|ALU2_Design.v|Driver.v|
+!s90 Driver.v|ALU2_Design.v|mon_scr.v|TOP_tb.v|reference_model.v|
 !i113 0
-Z8 o-L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
-R1
-n@a@l@u2
-vDriver
-!s110 1778402928
-!i10b 1
-!s100 ?cXhJ?^`9f4Njbgi^dg0_0
-IbTOAH;B_n4<EE5DVF3MeV2
+Z7 o-L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
 R3
+n@a@l@u2
+valu_param
+!s110 1778404927
+!i10b 1
+!s100 R<74e7GzIWJP:o[FXniSN3
+IA@co4J>]BNVKe@AXF??ZE3
+R5
 R0
-w1778402924
+w1778404216
+8DUT.v
+FDUT.v
+L0 1
+R6
+r1
+!s85 0
+31
+!s108 1778404927.000000
+!s107 DUT.v|
+!s90 +acc|+cover|-l|log_file.log|DUT.v|
+!i113 0
+!s102 +cover
+o+acc +cover -L mtiAvm -L mtiRnm -L mtiOvm -L mtiUvm -L mtiUPF -L infact
+R3
+vDriver
+Z8 !s110 1778404922
+!i10b 1
+!s100 Afo3JL4^efVBW^NUR6hW02
+IdaBnTB3=;;Eb;HaX@IaE=2
+R5
+R0
+w1778404687
 8Driver.v
 FDriver.v
-L0 2
-R4
+L0 1
+R6
 r1
 !s85 0
 31
-!s108 1778402928.000000
-!s107 Driver.v|
-!s90 Driver.v|
+Z9 !s108 1778404922.000000
+Z10 !s107 TOP_tb.v|mon_scr.v|reference_model.v|Driver.v|DUT.v|
+Z11 !s90 DUT.v|Driver.v|reference_model.v|mon_scr.v|TOP_tb.v|
 !i113 0
-R8
-R1
+R7
+R3
 n@driver
 vmon_scr
-!s110 1778402778
+R8
 !i10b 1
-!s100 Pce;iLlRzAdLn>Pbim6;F3
-IELTZCBT]J[1oQQ3L[:h;_1
-R3
+!s100 Y6ZdXH?8;zj;2Dhi`H4]X3
+IXY65e]Q>L[550NKC<JP6j1
+R5
 R0
-w1778402759
+w1778404919
 8mon_scr.v
 Fmon_scr.v
-L0 2
-R4
+L0 1
+R6
 r1
 !s85 0
 31
-!s108 1778402778.000000
-!s107 mon_scr.v|
-!s90 mon_scr.v|
+R9
+R10
+R11
 !i113 0
-R8
-R1
-vref_mod
-!s110 1778392622
-!i10b 1
-!s100 h5`AYZjHIE9@O3T`Zn=_d3
-IO51cm<OfX53WMP5?8ESS_2
+R7
 R3
+vref_mod
+R8
+!i10b 1
+!s100 0l`iP_RWz32:6`5[R5TON2
+I:U4=hG>e=mAF<bD<k]P>m1
+R5
 R0
-w1778392611
+w1778402759
 8reference_model.v
 Freference_model.v
-L0 4
-R4
-r1
-!s85 0
-31
-!s108 1778392622.000000
-!s107 reference_model.v|
-!s90 reference_model.v|
-!i113 0
-R8
-R1
-vtest
-R2
-!i10b 1
-!s100 >ZCXILoe_4hgJjhH<mEgb1
-IzPSij]FQ>Ab;VZfioFGzG2
-R3
-R0
-w1778091684
-8tb.v
-Ftb.v
 L0 1
-R4
+R6
 r1
 !s85 0
 31
-R5
-R6
-R7
+R9
+R10
+R11
 !i113 0
+R7
+R3
+vtest
 R8
-R1
+!i10b 1
+!s100 g4cC7Q]=eV`_>EJ>lD1d41
+IV[6El1fSgJEK8]l5Nj0ZI0
+R5
+R0
+w1778404903
+8TOP_tb.v
+FTOP_tb.v
+L0 2
+R6
+r1
+!s85 0
+31
+R9
+R10
+R11
+!i113 0
+R7
+R3
