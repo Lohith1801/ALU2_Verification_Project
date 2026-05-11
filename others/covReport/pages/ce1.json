@@ -1,0 +1,60 @@
+var g_data = {
+e4:[{dummy:0}
+,{anchor:'cvg57',cr:'c',items:[{s:'5',x:'FE',z:'(((~temp_sum[7] & opa[7]) & opb[7]) | ((opa[7] ~| opb[7]) & temp_sum[7]))',c:'G',p:'100.00',d:'0',F:'2'}
+,{}
+,{z:'temp_sum[7]',c:'g',r:'',i:''}
+,{z:'opa[7]',c:'g',r:'',i:''}
+,{z:'opb[7]',c:'g',r:'',i:''}
+,{}
+,{n:'1',z:'temp_sum[7]_0',t:'e',h1:'1',h2:'0',c1:'(opb[7] && opa[7]), (~((~temp_sum[7] & opa[7]) & opb[7]) && (opa[7] ~| opb[7]))',c2:'(opb[7] && opa[7]), (~((~temp_sum[7] & opa[7]) & opb[7]) && (opa[7] ~| opb[7]))'}
+,{n:'2',z:'temp_sum[7]_1',t:'e',h1:'0',h2:'1',c1:'(opb[7] && opa[7]), (opa[7] ~| opb[7])',c2:'(opb[7] && opa[7]), (opa[7] ~| opb[7])'}
+,{n:'3',z:'opa[7]_0',t:'e',h1:'0',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
+,{n:'4',z:'opa[7]_1',t:'e',h1:'1',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
+,{n:'5',z:'opb[7]_0',t:'e',h1:'1',h2:'1',c1:'(~((opa[7] ~| opb[7]) & temp_sum[7]) && (~temp_sum[7] & opa[7])), (temp_sum[7] && ~opa[7])',c2:'(~((opa[7] ~| opb[7]) & temp_sum[7]) && (~temp_sum[7] & opa[7])), (temp_sum[7] && ~opa[7])'}
+,{n:'6',z:'opb[7]_1',t:'e',h1:'0',h2:'1',c1:'(~temp_sum[7] & opa[7]), (temp_sum[7] && ~opa[7])',c2:'(~temp_sum[7] & opa[7]), (temp_sum[7] && ~opa[7])'}
+]}
+,{anchor:'cvg59',items:[{s:'5',x:'FE',z:'((opa[7] ^ opb[7]) & (opa[7] ^ temp_sum[7]))',c:'Y',p:'66.66',d:'0',F:'2'}
+,{}
+,{z:'opa[7]',c:'g',r:'',i:''}
+,{z:'opb[7]',c:'r',r:'Both rows hit for same output ->1',i:'Hit either row for output ->0'}
+,{z:'temp_sum[7]',c:'g',r:'',i:''}
+,{}
+,{n:'1',z:'opa[7]_0',t:'e',h1:'1',h2:'1',c1:'(opa[7] ^ temp_sum[7]), (opa[7] ^ opb[7])',c2:'(opa[7] ^ temp_sum[7]), (opa[7] ^ opb[7])'}
+,{n:'2',z:'opa[7]_1',t:'e',h1:'0',h2:'1',c1:'(opa[7] ^ temp_sum[7]), (opa[7] ^ opb[7])',c2:'(opa[7] ^ temp_sum[7]), (opa[7] ^ opb[7])'}
+,{n:'3',z:'opb[7]_0',t:'e',h1:'0',h2:'1',c1:'(opa[7] ^ temp_sum[7])',c2:'(opa[7] ^ temp_sum[7])'}
+,{n:'4',z:'opb[7]_1',t:'e',h1:'0',h2:'1',c1:'(opa[7] ^ temp_sum[7])',c2:'(opa[7] ^ temp_sum[7])'}
+,{n:'5',z:'temp_sum[7]_0',t:'e',h1:'1',h2:'1',c1:'(opa[7] ^ opb[7])',c2:'(opa[7] ^ opb[7])'}
+,{n:'6',z:'temp_sum[7]_1',t:'e',h1:'0',h2:'1',c1:'(opa[7] ^ opb[7])',c2:'(opa[7] ^ opb[7])'}
+]}
+],
+e8:[{dummy:0}
+,{anchor:'cvg57',cr:'c',items:[{s:'5',x:'FE',z:'(((~temp_sum[7] & opa[7]) & opb[7]) | ((opa[7] ~| opb[7]) & temp_sum[7]))',c:'G',p:'100.00',d:'0',F:'2'}
+,{}
+,{z:'temp_sum[7]',c:'g',r:'',i:''}
+,{z:'opa[7]',c:'g',r:'',i:''}
+,{z:'opb[7]',c:'g',r:'',i:''}
+,{}
+,{n:'1',z:'temp_sum[7]_0',t:'e',h1:'1',h2:'0',c1:'(opb[7] && opa[7]), (~((~temp_sum[7] & opa[7]) & opb[7]) && (opa[7] ~| opb[7]))',c2:'(opb[7] && opa[7]), (~((~temp_sum[7] & opa[7]) & opb[7]) && (opa[7] ~| opb[7]))'}
+,{n:'2',z:'temp_sum[7]_1',t:'e',h1:'0',h2:'1',c1:'(opb[7] && opa[7]), (opa[7] ~| opb[7])',c2:'(opb[7] && opa[7]), (opa[7] ~| opb[7])'}
+,{n:'3',z:'opa[7]_0',t:'e',h1:'0',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
+,{n:'4',z:'opa[7]_1',t:'e',h1:'1',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
+,{n:'5',z:'opb[7]_0',t:'e',h1:'1',h2:'1',c1:'(~((opa[7] ~| opb[7]) & temp_sum[7]) && (~temp_sum[7] & opa[7])), (temp_sum[7] && ~opa[7])',c2:'(~((opa[7] ~| opb[7]) & temp_sum[7]) && (~temp_sum[7] & opa[7])), (temp_sum[7] && ~opa[7])'}
+,{n:'6',z:'opb[7]_1',t:'e',h1:'0',h2:'1',c1:'(~temp_sum[7] & opa[7]), (temp_sum[7] && ~opa[7])',c2:'(~temp_sum[7] & opa[7]), (temp_sum[7] && ~opa[7])'}
+]}
+,{anchor:'cvg59',items:[{s:'5',x:'FE',z:'((opa[7] ^ opb[7]) & (opa[7] ^ temp_sum[7]))',c:'Y',p:'66.66',d:'0',F:'2'}
+,{}
+,{z:'opa[7]',c:'g',r:'',i:''}
+,{z:'opb[7]',c:'r',r:'Both rows hit for same output ->1',i:'Hit either row for output ->0'}
+,{z:'temp_sum[7]',c:'g',r:'',i:''}
+,{}
+,{n:'1',z:'opa[7]_0',t:'e',h1:'1',h2:'1',c1:'(opa[7] ^ temp_sum[7]), (opa[7] ^ opb[7])',c2:'(opa[7] ^ temp_sum[7]), (opa[7] ^ opb[7])'}
+,{n:'2',z:'opa[7]_1',t:'e',h1:'0',h2:'1',c1:'(opa[7] ^ temp_sum[7]), (opa[7] ^ opb[7])',c2:'(opa[7] ^ temp_sum[7]), (opa[7] ^ opb[7])'}
+,{n:'3',z:'opb[7]_0',t:'e',h1:'0',h2:'1',c1:'(opa[7] ^ temp_sum[7])',c2:'(opa[7] ^ temp_sum[7])'}
+,{n:'4',z:'opb[7]_1',t:'e',h1:'0',h2:'1',c1:'(opa[7] ^ temp_sum[7])',c2:'(opa[7] ^ temp_sum[7])'}
+,{n:'5',z:'temp_sum[7]_0',t:'e',h1:'1',h2:'1',c1:'(opa[7] ^ opb[7])',c2:'(opa[7] ^ opb[7])'}
+,{n:'6',z:'temp_sum[7]_1',t:'e',h1:'0',h2:'1',c1:'(opa[7] ^ opb[7])',c2:'(opa[7] ^ opb[7])'}
+]}
+],
+dummyEnd:0
+};
+processCondExprData(g_data);
