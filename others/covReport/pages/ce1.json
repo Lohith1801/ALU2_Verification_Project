@@ -7,9 +7,9 @@ e4:[{dummy:0}
 ,{z:'opb[7]',c:'g',r:'',i:''}
 ,{}
 ,{n:'1',z:'temp_sum[7]_0',t:'e',h1:'1',h2:'0',c1:'(opb[7] && opa[7]), (~((~temp_sum[7] & opa[7]) & opb[7]) && (opa[7] ~| opb[7]))',c2:'(opb[7] && opa[7]), (~((~temp_sum[7] & opa[7]) & opb[7]) && (opa[7] ~| opb[7]))'}
-,{n:'2',z:'temp_sum[7]_1',t:'e',h1:'0',h2:'1',c1:'(opb[7] && opa[7]), (opa[7] ~| opb[7])',c2:'(opb[7] && opa[7]), (opa[7] ~| opb[7])'}
-,{n:'3',z:'opa[7]_0',t:'e',h1:'0',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
-,{n:'4',z:'opa[7]_1',t:'e',h1:'1',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
+,{n:'2',z:'temp_sum[7]_1',t:'e',h1:'1',h2:'1',c1:'(opb[7] && opa[7]), (opa[7] ~| opb[7])',c2:'(opb[7] && opa[7]), (opa[7] ~| opb[7])'}
+,{n:'3',z:'opa[7]_0',t:'e',h1:'1',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
+,{n:'4',z:'opa[7]_1',t:'e',h1:'0',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
 ,{n:'5',z:'opb[7]_0',t:'e',h1:'1',h2:'1',c1:'(~((opa[7] ~| opb[7]) & temp_sum[7]) && (~temp_sum[7] & opa[7])), (temp_sum[7] && ~opa[7])',c2:'(~((opa[7] ~| opb[7]) & temp_sum[7]) && (~temp_sum[7] & opa[7])), (temp_sum[7] && ~opa[7])'}
 ,{n:'6',z:'opb[7]_1',t:'e',h1:'0',h2:'1',c1:'(~temp_sum[7] & opa[7]), (temp_sum[7] && ~opa[7])',c2:'(~temp_sum[7] & opa[7]), (temp_sum[7] && ~opa[7])'}
 ]}
@@ -35,9 +35,9 @@ e8:[{dummy:0}
 ,{z:'opb[7]',c:'g',r:'',i:''}
 ,{}
 ,{n:'1',z:'temp_sum[7]_0',t:'e',h1:'1',h2:'0',c1:'(opb[7] && opa[7]), (~((~temp_sum[7] & opa[7]) & opb[7]) && (opa[7] ~| opb[7]))',c2:'(opb[7] && opa[7]), (~((~temp_sum[7] & opa[7]) & opb[7]) && (opa[7] ~| opb[7]))'}
-,{n:'2',z:'temp_sum[7]_1',t:'e',h1:'0',h2:'1',c1:'(opb[7] && opa[7]), (opa[7] ~| opb[7])',c2:'(opb[7] && opa[7]), (opa[7] ~| opb[7])'}
-,{n:'3',z:'opa[7]_0',t:'e',h1:'0',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
-,{n:'4',z:'opa[7]_1',t:'e',h1:'1',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
+,{n:'2',z:'temp_sum[7]_1',t:'e',h1:'1',h2:'1',c1:'(opb[7] && opa[7]), (opa[7] ~| opb[7])',c2:'(opb[7] && opa[7]), (opa[7] ~| opb[7])'}
+,{n:'3',z:'opa[7]_0',t:'e',h1:'1',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
+,{n:'4',z:'opa[7]_1',t:'e',h1:'0',h2:'1',c1:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])',c2:'(opb[7] && ~temp_sum[7]), (temp_sum[7] && ~opb[7])'}
 ,{n:'5',z:'opb[7]_0',t:'e',h1:'1',h2:'1',c1:'(~((opa[7] ~| opb[7]) & temp_sum[7]) && (~temp_sum[7] & opa[7])), (temp_sum[7] && ~opa[7])',c2:'(~((opa[7] ~| opb[7]) & temp_sum[7]) && (~temp_sum[7] & opa[7])), (temp_sum[7] && ~opa[7])'}
 ,{n:'6',z:'opb[7]_1',t:'e',h1:'0',h2:'1',c1:'(~temp_sum[7] & opa[7]), (temp_sum[7] && ~opa[7])',c2:'(~temp_sum[7] & opa[7]), (temp_sum[7] && ~opa[7])'}
 ]}

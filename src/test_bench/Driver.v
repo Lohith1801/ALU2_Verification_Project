@@ -270,7 +270,7 @@ begin
     OPA <= 8'd10;
     OPB <= 8'd20;
 end
-elu_paramndtask
+endtask
 
 task rotate_left_zero;
 begin
@@ -485,7 +485,7 @@ task branch_cov;
     end
     endtask
 task invalid_cmd_arith;
-beginalu_param
+begin
     @(negedge CLK);
     MODE <= 1;
     CE <= 1;
@@ -586,13 +586,178 @@ begin
     OPB <= 8;
 end
 endtask
+
+task all_random;
+begin
+	@(negedge CLK);
+	OPA <= $urandom_range(0,255);
+	OPB <= $urandom_range(0,255);
+	CMD <= $urandom_range(0,13);
+	INP_VALID <= $urandom_range(0,3);
+	CIN <= $urandom_range(0,1);
+	CE <= $urandom_range(0,1);
+	MODE <= $urandom_range(0,1);
+end
+endtask
+task toggle_internal;
+    begin
+        @(negedge CLK);
+        MODE <= 1; CE <= 1; INP_VALID <= 2'b11;
+        
+        repeat(3) begin
+            CMD <= 9;
+            OPA <= 8'h55; OPB <= 8'hAA;
+            @(negedge CLK);
+            OPA <= 8'hAA; OPB <= 8'h55;
+            @(negedge CLK);
+            OPA <= 8'hFF; OPB <= 8'hFF;
+            @(negedge CLK);
+            OPA <= 8'h00; OPB <= 8'h00;
+            @(negedge CLK);
+        end
+
+        repeat(3) begin
+            CMD <= 10;
+            OPA <= 8'hFF; OPB <= 8'hFF;
+            @(negedge CLK);
+            OPA <= 8'h01; OPB <= 8'h01;
+            @(negedge CLK);
+        end
+
+        for (i = 0; i < 8; i = i + 1) begin
+            CMD <= 9;
+            OPA <= (1 << i);
+            OPB <= ~(1 << i);
+            @(negedge CLK);
+            @(negedge CLK);
+        end
+    end
+    endtask
+task branch_fix;
+    begin
+        @(negedge CLK);
+        MODE <= 0;
+        CE <= 1;
+        INP_VALID <= 2'b11;
+        CMD <= 0;
+        
+        @(negedge CLK);
+        MODE <= 1;
+        CMD <= 9;
+        repeat(3) @(negedge CLK);
+        
+        @(negedge CLK);
+        CMD <= 15;
+    end
+    endtask
+
+    task toggle_fix;
+    begin
+        @(negedge CLK);
+        MODE <= 1;
+        CMD <= 9;
+        CE <= 1;
+        INP_VALID <= 2'b11;
+        OPA <= 8'hFF;
+        OPB <= 8'hFF;
+        repeat(3) @(negedge CLK);
+        
+        OPA <= 8'h00;
+        OPB <= 8'h00;
+        repeat(3) @(negedge CLK);
+    end
+    endtask
+task mode_x;
+begin
+        @(negedge CLK);
+        MODE <= 1'bx;
+        CMD <= 12;
+        OPA <= 8'h80;
+        OPB <= 8'h00;
+        @(negedge CLK);
+        OPA <= 8'h00;
+        OPB <= 8'h80;
+    end
+    endtask
+task signed_addition_fix;
+    begin
+        @(negedge CLK);
+        MODE <= 1;
+        CMD <= 11;
+        CE <= 1;
+        INP_VALID <= 2'b11;
+
+        OPA <= 8'h05; 
+        OPB <= 8'h02;
+        @(negedge CLK);
+
+        OPA <= 8'h05;
+        OPB <= 8'h05;
+        @(negedge CLK);
+
+        OPA <= 8'h02;
+        OPB <= 8'h05;
+        @(negedge CLK);
+
+        OPA <= 8'hFB; 
+        OPB <= 8'hFD;
+        @(negedge CLK);
+    end
+    endtask
+    task fec_fix;
+    begin
+        @(negedge CLK);
+        MODE <= 1;
+        CMD <= 12;
+        OPA <= 8'h80;
+        OPB <= 8'h00;
+        @(negedge CLK);
+        OPA <= 8'h00;
+        OPB <= 8'h80;
+    end
+    endtask
+task signed_addition_comparison_fix;
+    begin
+        @(negedge CLK);
+        MODE <= 1;
+        CMD <= 11;
+        CE <= 1;
+        INP_VALID <= 2'b11;
+
+        OPA <= 8'h0A; 
+        OPB <= 8'h05;
+        @(negedge CLK);
+
+        OPA <= 8'h0A;
+        OPB <= 8'h0A;
+        @(negedge CLK);
+
+        OPA <= 8'h05;
+        OPB <= 8'h0A;
+        @(negedge CLK);
+
+        OPA <= 8'hF6; 
+        OPB <= 8'h0A;
+        @(negedge CLK);
+
+        OPA <= 8'h0A;
+        OPB <= 8'hF6;
+        @(negedge CLK);
+    end
+    endtask
 initial begin
     MODE = 0; CE = 0; INP_VALID = 0; CMD = 0; OPA = 0; OPB = 0; CIN = 0;
     #30;
-
+  //  repeat(500)
+//	all_random();	
     repeat(150) begin
+	//all_random();
+	toggle_internal();
 		branch_cov();
         basic_arithmatic_operation();
+	signed_addition_comparison_fix();
+	mode_x();
+	signed_addition_fix();
         basic_logical_operation();
         add_corner_cases();
         sub_corner_cases();
@@ -610,8 +775,8 @@ initial begin
     less_case();
     greater_case();
     equal_case();
-
-
+	toggle_fix();
+	fec_fix();
 	repeat(20) invalid_cmd_arith();
 repeat(20) invalid_cmd_logic();
 
